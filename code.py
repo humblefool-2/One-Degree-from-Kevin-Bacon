@@ -1,12 +1,23 @@
 # your name                                                                                                                                                                                 
 # your GTID#                                                                                                                                                                                
                                                                                                                                                                                             
-import urllib.request, json, time, requests, sys, re, csv                                                                                                                                             
+import urllib.request, json, time, requests, sys, re, csv, codecs                                                                                                                                             
                                                                                                                                                                                             
-from bs4 import BeautifulSoup as bs                                                                                                                                                         
+from bs4 import BeautifulSoup as bs
+                                                                                                                                                         
                                                                                                                                                                                             
 API_KEY='e307d3989f772742e4794219effaf23f'                                                                                                                                                  
-                                                                                                                                                                                            
+                                               
+def pr(s):
+  try:
+    print (s)
+  except UnicodeEncodeError:
+    for c in s:
+      try:
+        print(c,end='')
+      except UnicodeEncodeError:
+        print ('?',end='')
+	                                                                                                                                             
 def scrape_all_movies(url): #returns all movies' name and their urls                                                                                                                        
   page=urllib.request.urlopen(url)                                                                                                                                                          
                                                                                                                                                                                             
@@ -52,7 +63,7 @@ def req_movies_for_actor(actor_id): #returns all the movies in which an actor wi
 def req_actors_for_movie(movie_id): #returns all the cast members in the movie with movie_id                                                                                                
   response=requests.get("https://api.themoviedb.org/3/movie/"+str(movie_id)+"/credits?api_key="+API_KEY+"&language=en-US")                                                                                                                                      
   #print (r.status_code)                                                                                                                                                                    
-  x=response.json()                                                                                                                                                                                
+  x=response.json()                                                                                                                                                                               
   t=x.get('cast', None)      
   #print (t)
   result=[]                                                                                                                                                                               
@@ -76,7 +87,7 @@ def one_deg_from_actor(from_actor_id): #returns all the co-stars for an actor wi
   res1=req_movies_for_actor(from_actor_id)                                                                                                                                                                                                                                                                                                                                                               
   for i in res1:                                                                                                                                                                            
     for k in i: 
-      time.sleep(0.5)
+      time.sleep(0.105)
       response=req_actors_for_movie(k)                                                                                                                                                      
       for j in response:                                                                                                                                                                    
         for v in j.values():                                                                                                                                                                
@@ -93,12 +104,14 @@ def main(args):
     print ("No actor chosen. Do you want to play one degree from the default chosen one, Kevin Bacon?")   
     a=input()
     if a=='yes': #user enters yes
-      print (one_deg_from_actor(4724))
+      res=(one_deg_from_actor(117334))
+      pr (res)
     else:  #user enters no                                                                                                                                                                                 
       print ("Bye!!")                                                                                                                                                                                                                                                                                                                                                
   elif len(args)>=2:                                                                                                                                                                        
     if args[1].isdigit()==True: #actor_id must be integer                                                                                                                                                                  
       if len(args)==3:
+          #print (args[2]) 
           name,format=args[2].split('.')
           if format!='csv': #format must be csv
             print ("ERROR: The output filename provided does not have a .csv extension. Please try again with a valid filename.")
